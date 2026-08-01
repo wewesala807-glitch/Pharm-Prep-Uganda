@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1a56db;
+  --color-accent-green: #16a34a;
+  --color-accent-gold: #f59e0b;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-dark: #0f172a;
+  --color-muted: #94a3b8;
+  --color-premium: #7c3aed;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-dark);
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sora), sans-serif;
+}
+
+.note-content {
+  font-family: var(--font-source-serif), serif;
+  line-height: 1.75;
+}
+
+.note-content img {
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+}
+
+/* lite-youtube-embed base styling hook */
+lite-youtube {
+  border-radius: 1rem;
+  overflow: hidden;
+  background-color: #000;
+}
+
+@media (max-width: 768px) {
+  .tap-target {
+    min-height: 44px;
+  }
+}

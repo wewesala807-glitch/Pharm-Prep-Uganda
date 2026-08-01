@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.env
+.env.local
+*.tsbuildinfo
+public/sw.js
+public/workbox-*.js
+public/worker-*.js
+public/fallback-*.js
