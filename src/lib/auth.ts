@@ -36,7 +36,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword,
+        );
         if (!isValid) {
           throw new Error("Invalid email or password");
         }
@@ -58,15 +61,24 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = (user as any).role;
         token.plan = (user as any).plan;
+        token.lastRefreshed = Date.now();
+        return token;
       }
-      // Refresh role/plan from DB periodically so admin upgrades / plan changes propagate
-      if (!user && token.id) {
-        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+
+      const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+      const lastRefreshed = (token.lastRefreshed as number | undefined) ?? 0;
+
+      if (token.id && Date.now() - lastRefreshed > REFRESH_INTERVAL_MS) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+        });
         if (dbUser) {
           token.role = dbUser.role;
           token.plan = dbUser.plan;
         }
+        token.lastRefreshed = Date.now();
       }
+
       return token;
     },
     async session({ session, token }) {
