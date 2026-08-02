@@ -2,8 +2,9 @@ import Flutterwave from "flutterwave-node-v3";
 
 // Constructed lazily so an unset key doesn't crash pages that merely import
 // this module without actually initiating a payment.
-let _flw: Flutterwave | null = null;
-function getFlw(): Flutterwave {
+let _flw: any = null;
+
+function getFlw(): any {
   if (!process.env.FLUTTERWAVE_PUBLIC_KEY || !process.env.FLUTTERWAVE_SECRET_KEY) {
     throw new Error(
       "Flutterwave is not configured. Set FLUTTERWAVE_PUBLIC_KEY and FLUTTERWAVE_SECRET_KEY in .env."
