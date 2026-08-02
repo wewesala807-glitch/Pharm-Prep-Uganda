@@ -1,9 +1,17 @@
 import Flutterwave from "flutterwave-node-v3";
 
-const flw = new Flutterwave(
-  process.env.FLUTTERWAVE_PUBLIC_KEY!,
-  process.env.FLUTTERWAVE_SECRET_KEY!
-);
+// Constructed lazily so an unset key doesn't crash pages that merely import
+// this module without actually initiating a payment.
+let _flw: Flutterwave | null = null;
+function getFlw(): Flutterwave {
+  if (!process.env.FLUTTERWAVE_PUBLIC_KEY || !process.env.FLUTTERWAVE_SECRET_KEY) {
+    throw new Error(
+      "Flutterwave is not configured. Set FLUTTERWAVE_PUBLIC_KEY and FLUTTERWAVE_SECRET_KEY in .env."
+    );
+  }
+  _flw ??= new Flutterwave(process.env.FLUTTERWAVE_PUBLIC_KEY, process.env.FLUTTERWAVE_SECRET_KEY);
+  return _flw;
+}
 
 export const PLAN_PRICING_UGX: Record<number, number> = {
   1: 25000,
@@ -33,7 +41,7 @@ export async function initiateMobileMoneyPayment(params: InitiateMobileMoneyPara
   };
 
   // Uganda mobile money charge endpoint
-  return flw.MobileMoney.uganda(payload);
+  return getFlw().MobileMoney.uganda(payload);
 }
 
 export function verifyWebhookSignature(signatureHeader: string | null) {
@@ -41,7 +49,7 @@ export function verifyWebhookSignature(signatureHeader: string | null) {
 }
 
 export async function verifyTransaction(transactionId: string) {
-  return flw.Transaction.verify({ id: transactionId });
+  return getFlw().Transaction.verify({ id: transactionId });
 }
 
-export { flw };
+export { getFlw };

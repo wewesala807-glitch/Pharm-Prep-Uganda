@@ -1,6 +1,15 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Constructed lazily so a missing key doesn't crash pages that import this
+// module without actually sending an email.
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("Resend is not configured. Set RESEND_API_KEY in .env.");
+  }
+  _resend ??= new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 export async function sendPaymentConfirmationEmail(params: {
   to: string;
@@ -12,7 +21,7 @@ export async function sendPaymentConfirmationEmail(params: {
 }) {
   const { to, name, plan, months, amount, expiresAt } = params;
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: process.env.FROM_EMAIL!,
     to,
     subject: "Your PharmaPrep Uganda Premium subscription is active",
